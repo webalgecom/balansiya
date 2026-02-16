@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Balansiya</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 40px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 42px;
+    margin-bottom: 30px;
+}
+
+.search-container {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 500px;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 30px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 30px;
+    border: none;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.quick-links {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.quick-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+.quick-links a:hover {
+    text-decoration: underline;
+}
+
+#results {
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.result {
+    margin-bottom: 20px;
+}
+
+.result a {
+    font-size: 18px;
+    color: #1a0dab;
+    text-decoration: none;
+}
+
+.result a:hover {
+    text-decoration: underline;
+}
+
+.snippet {
+    font-size: 14px;
+    color: #4d5156;
+    margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<h1>Balansiya</h1>
+
+<div class="search-container">
+    <input type="text" id="query" placeholder="Buscar en la web">
+    <button onclick="search()">Buscar</button>
+
+    <div class="quick-links">
+        Buscar también en:
+        <a href="#" onclick="external('google')">Google</a>
+        <a href="#" onclick="external('bing')">Bing</a>
+        <a href="#" onclick="external('qwant')">Qwant</a>
+        <a href="#" onclick="external('yandex')">Yandex</a>
+    </div>
+</div>
+
+<div id="results"></div>
+
+<script>
+async function search() {
+    const query = document.getElementById('query').value;
+    const resultsDiv = document.getElementById('results');
+
+    resultsDiv.innerHTML = "Buscando...";
+
+    const res = await fetch(`/search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    resultsDiv.innerHTML = "";
+
+    if (data.length === 0) {
+        resultsDiv.innerHTML = "No se encontraron resultados.";
+        return;
+    }
+
+    data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'result';
+        div.innerHTML = `
+            <a href="${item.link}" target="_blank">${item.title}</a>
+            <div class="snippet">${item.snippet}</div>
+        `;
+        resultsDiv.appendChild(div);
+    });
+}
+
+function external(engine) {
+    const query = document.getElementById('query').value;
+    let url = "";
+
+    if (engine === "google") url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    if (engine === "bing") url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+    if (engine === "qwant") url = `https://www.qwant.com/?q=${encodeURIComponent(query)}`;
+    if (engine === "yandex") url = `https://yandex.com/search/?text=${encodeURIComponent(query)}`;
+
+    window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
